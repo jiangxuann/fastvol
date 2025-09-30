@@ -30,7 +30,7 @@ The high-level development plan, in order of implementation:
 |  9   | Minimal-overhead Python wrapper via Cython (on PyPI)     |   ✅   |
 | 10   | CUDA support for Greeks and IV inversion                 |   ⏳   |
 | 11   | SLEEF integration for faster CPU European pricing        |   ⏳   |
-| 12   | C++ neural network support via LibTorch                  |        |
+| 12   | C++ neural network support via LibTorch                  |   ✅    |
 | 13   | Stochastic models: heston, local volatility...           |        |
 | 14   | Exotic options: barrier, lookback, asian...              |        |
 | 15   | Precompiled wheels for Linux, macOS, and Windows         |        |
