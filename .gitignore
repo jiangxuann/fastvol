@@ -15,9 +15,21 @@ build
 *.o
 *.vscode
 *.a
-core/build
+core/build*
 .ruff_cache
 .vscode
+
+# LibTorch artifacts
+libtorch/
+*.zip
+*.pt
+
+# Build artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
 
 python/fastvol/_core
 python/dist

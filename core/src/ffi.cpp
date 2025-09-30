@@ -3,6 +3,9 @@
 #include "fastvol/american/bopm.hpp"
 #include "fastvol/american/psor.hpp"
 #include "fastvol/american/ttree.hpp"
+#ifdef FASTVOL_NEURAL_ENABLED
+#include "fastvol/american/neural.hpp"
+#endif
 #include "fastvol/european/bsm.hpp"
 
 #include <cstddef>
@@ -2086,4 +2089,100 @@ extern "C"
         return false;
 #endif
     }
+
+    bool fastvol_neural_available(void)
+    {
+#ifdef FASTVOL_NEURAL_ENABLED
+        return true;
+#else
+        return false;
+#endif
+    }
+
+#ifdef FASTVOL_NEURAL_ENABLED
+    /* american::neural ==============================================================================*/
+    /* fp64 ------------------------------------------------------------------------------------------*/
+    /* price _________________________________________________________________________________________*/
+    double american_neural_price_fp64(double S, double K, char cp_flag, double ttm, double iv,
+                                     double r, double q, const char* model_path)
+    {
+        return fastvol::american::neural::price_fp64(S, K, cp_flag, ttm, iv, r, q, model_path);
+    }
+
+    void american_neural_price_fp64_batch(const double *__restrict__ S,
+                                         const double *__restrict__ K,
+                                         const char *__restrict__ cp_flag,
+                                         const double *__restrict__ ttm,
+                                         const double *__restrict__ iv,
+                                         const double *__restrict__ r,
+                                         const double *__restrict__ q,
+                                         size_t n_options,
+                                         double *__restrict__ results,
+                                         const char* model_path)
+    {
+        fastvol::american::neural::price_fp64_batch(S, K, cp_flag, ttm, iv, r, q, n_options, results, model_path);
+    }
+
+    /* iv ____________________________________________________________________________________________*/
+    double american_neural_iv_fp64(double P, double S, double K, char cp_flag, double ttm,
+                                  double r, double q, const char* model_path)
+    {
+        return fastvol::american::neural::iv_fp64(P, S, K, cp_flag, ttm, r, q, model_path);
+    }
+
+    void american_neural_iv_fp64_batch(const double *__restrict__ P,
+                                      const double *__restrict__ S,
+                                      const double *__restrict__ K,
+                                      const char *__restrict__ cp_flag,
+                                      const double *__restrict__ ttm,
+                                      const double *__restrict__ r,
+                                      const double *__restrict__ q,
+                                      size_t n_options,
+                                      double *__restrict__ results,
+                                      const char* model_path)
+    {
+        fastvol::american::neural::iv_fp64_batch(P, S, K, cp_flag, ttm, r, q, n_options, results, model_path);
+    }
+
+    /* fp32 ------------------------------------------------------------------------------------------*/
+    float american_neural_price_fp32(float S, float K, char cp_flag, float ttm, float iv,
+                                    float r, float q, const char* model_path)
+    {
+        return fastvol::american::neural::price_fp32(S, K, cp_flag, ttm, iv, r, q, model_path);
+    }
+
+    void american_neural_price_fp32_batch(const float *__restrict__ S,
+                                         const float *__restrict__ K,
+                                         const char *__restrict__ cp_flag,
+                                         const float *__restrict__ ttm,
+                                         const float *__restrict__ iv,
+                                         const float *__restrict__ r,
+                                         const float *__restrict__ q,
+                                         size_t n_options,
+                                         float *__restrict__ results,
+                                         const char* model_path)
+    {
+        fastvol::american::neural::price_fp32_batch(S, K, cp_flag, ttm, iv, r, q, n_options, results, model_path);
+    }
+
+    float american_neural_iv_fp32(float P, float S, float K, char cp_flag, float ttm,
+                                 float r, float q, const char* model_path)
+    {
+        return fastvol::american::neural::iv_fp32(P, S, K, cp_flag, ttm, r, q, model_path);
+    }
+
+    void american_neural_iv_fp32_batch(const float *__restrict__ P,
+                                      const float *__restrict__ S,
+                                      const float *__restrict__ K,
+                                      const char *__restrict__ cp_flag,
+                                      const float *__restrict__ ttm,
+                                      const float *__restrict__ r,
+                                      const float *__restrict__ q,
+                                      size_t n_options,
+                                      float *__restrict__ results,
+                                      const char* model_path)
+    {
+        fastvol::american::neural::iv_fp32_batch(P, S, K, cp_flag, ttm, r, q, n_options, results, model_path);
+    }
+#endif
 }

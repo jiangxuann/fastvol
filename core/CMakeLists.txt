@@ -23,7 +23,12 @@ include(GNUInstallDirs)
 
 
 # base C flags -----------------------------------------------------------------------------------*/
-set(CMAKE_CXX_FLAGS "-O3 -march=native -ffast-math ")
+if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # macOS Clang doesn't support -march=native, use -mcpu=native instead
+    set(CMAKE_CXX_FLAGS "-O3 -mcpu=native -ffast-math ")
+else()
+    set(CMAKE_CXX_FLAGS "-O3 -march=native -ffast-math ")
+endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -ffp-contract=fast -fno-math-errno")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${PROJECT_SOURCE_DIR}/include")
 
@@ -95,6 +100,31 @@ elseif ("$ENV{FASTVOL_CUDA_ENABLED}" STREQUAL "1")
 endif()
 
 
+# Neural network detection (LibTorch) ------------------------------------------------------------*/
+set(NEURAL_ENABLED OFF)
+if (NOT DEFINED ENV{FASTVOL_NEURAL_ENABLED})
+    # Try to find LibTorch in common locations
+    if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/libtorch/share/cmake/Torch")
+        set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/libtorch" ${CMAKE_PREFIX_PATH})
+    endif()
+    find_package(Torch QUIET)
+    if(TORCH_FOUND)
+        message(STATUS "LibTorch detected: ${TORCH_LIBRARIES}")
+        set(NEURAL_ENABLED ON)
+    else()
+        message(STATUS "LibTorch not found: building without neural support")
+    endif()
+elseif ("$ENV{FASTVOL_NEURAL_ENABLED}" STREQUAL "1")
+    find_package(Torch REQUIRED)
+    if(TORCH_FOUND)
+        message(STATUS "LibTorch forced ON via FASTVOL_NEURAL_ENABLED")
+        set(NEURAL_ENABLED ON)
+    else()
+        message(FATAL_ERROR "FASTVOL_NEURAL_ENABLED=1 but LibTorch not found")
+    endif()
+endif()
+
+
 # source discovery -------------------------------------------------------------------------------*/
 file(GLOB_RECURSE SRC_CXX ${PROJECT_SOURCE_DIR}/src/*.cpp)
 set(SRC_ALL ${SRC_CXX})
@@ -121,6 +151,14 @@ if (CUDA_ENABLED)
     target_link_libraries(fastvol PRIVATE cudart cublas)
 endif()
 
+if (NEURAL_ENABLED)
+    target_compile_definitions(fastvol PUBLIC FASTVOL_NEURAL_ENABLED)
+    target_link_libraries(fastvol PRIVATE ${TORCH_LIBRARIES})
+
+    # Ensure C++17 for LibTorch compatibility
+    set_property(TARGET fastvol PROPERTY CXX_STANDARD 17)
+endif()
+
 if (OpenMP_CXX_FOUND)
     target_link_libraries(fastvol PRIVATE ${OpenMP_omp_LIBRARY})
 endif()
@@ -137,6 +175,9 @@ foreach(target IN LISTS BENCH_TARGETS)
     target_link_libraries(${target} PRIVATE fastvol)
     if (CUDA_ENABLED)
         target_compile_definitions(${target} PRIVATE FASTVOL_CUDA_ENABLED)
+    endif()
+    if (NEURAL_ENABLED)
+        target_compile_definitions(${target} PRIVATE FASTVOL_NEURAL_ENABLED)
     endif()
 endforeach()
 

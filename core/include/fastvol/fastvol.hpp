@@ -16,6 +16,9 @@
 #include "american/bopm.hpp"
 #include "american/psor.hpp"
 #include "american/ttree.hpp"
+#ifdef FASTVOL_NEURAL_ENABLED
+#include "american/neural.hpp"
+#endif
 #include "european/bsm.hpp"
 
 /**
@@ -31,6 +34,19 @@ const char *fastvol_version(void) { return "0.1.1"; }
 bool fastvol_cuda_available(void)
 {
 #ifdef FASTVOL_CUDA_ENABLED
+    return true;
+#else
+    return false;
+#endif
+}
+
+/**
+ * @brief Checks if the fastvol library was compiled with neural network support.
+ * @return True if neural networks are available, false otherwise.
+ */
+bool fastvol_neural_available(void)
+{
+#ifdef FASTVOL_NEURAL_ENABLED
     return true;
 #else
     return false;

@@ -2066,6 +2066,107 @@ extern "C"
                                       const float *__restrict__ lo_init,
                                       const float *__restrict__ hi_init);
 
+#ifdef FASTVOL_NEURAL_ENABLED
+    /* american::neural ==============================================================================*/
+    /* fp64 ------------------------------------------------------------------------------------------*/
+    /* price _________________________________________________________________________________________*/
+    /**
+     * @brief Calculates the price of an American option using a neural network surrogate.
+     * @param S The current price of the underlying asset.
+     * @param K The strike price of the option.
+     * @param cp_flag The option type flag. Accepted values are 1, 'c', or 'C' for a call option, and 0,
+     * 'p', or 'P' for a put option.
+     * @param ttm The time to maturity of the option, in years.
+     * @param iv The implied volatility of the underlying asset.
+     * @param r The risk-free interest rate.
+     * @param q The dividend yield of the underlying asset.
+     * @param model_path Path to the TorchScript model file. Can be NULL for default.
+     * @return The calculated price of the option.
+     */
+    double american_neural_price_fp64(double S, double K, char cp_flag, double ttm, double iv,
+                                     double r, double q, const char* model_path);
+
+    /**
+     * @brief Calculates the prices of a batch of American options using neural networks.
+     */
+    void american_neural_price_fp64_batch(const double *__restrict__ S,
+                                         const double *__restrict__ K,
+                                         const char *__restrict__ cp_flag,
+                                         const double *__restrict__ ttm,
+                                         const double *__restrict__ iv,
+                                         const double *__restrict__ r,
+                                         const double *__restrict__ q,
+                                         size_t n_options,
+                                         double *__restrict__ results,
+                                         const char* model_path);
+
+    /* iv ____________________________________________________________________________________________*/
+    /**
+     * @brief Calculates the implied volatility of an American option using a neural network surrogate.
+     */
+    double american_neural_iv_fp64(double P, double S, double K, char cp_flag, double ttm,
+                                  double r, double q, const char* model_path);
+
+    /**
+     * @brief Calculates the implied volatilities for a batch of American options using neural networks.
+     */
+    void american_neural_iv_fp64_batch(const double *__restrict__ P,
+                                      const double *__restrict__ S,
+                                      const double *__restrict__ K,
+                                      const char *__restrict__ cp_flag,
+                                      const double *__restrict__ ttm,
+                                      const double *__restrict__ r,
+                                      const double *__restrict__ q,
+                                      size_t n_options,
+                                      double *__restrict__ results,
+                                      const char* model_path);
+
+    /* fp32 ------------------------------------------------------------------------------------------*/
+    /**
+     * @brief Calculates the price of an American option using a neural network surrogate (single precision).
+     * @see american_neural_price_fp64 for parameter details.
+     */
+    float american_neural_price_fp32(float S, float K, char cp_flag, float ttm, float iv,
+                                    float r, float q, const char* model_path);
+
+    /**
+     * @brief Calculates the prices of a batch of American options using neural networks (single precision).
+     * @see american_neural_price_fp64_batch for parameter details.
+     */
+    void american_neural_price_fp32_batch(const float *__restrict__ S,
+                                         const float *__restrict__ K,
+                                         const char *__restrict__ cp_flag,
+                                         const float *__restrict__ ttm,
+                                         const float *__restrict__ iv,
+                                         const float *__restrict__ r,
+                                         const float *__restrict__ q,
+                                         size_t n_options,
+                                         float *__restrict__ results,
+                                         const char* model_path);
+
+    /**
+     * @brief Calculates the implied volatility of an American option using a neural network surrogate (single precision).
+     * @see american_neural_iv_fp64 for parameter details.
+     */
+    float american_neural_iv_fp32(float P, float S, float K, char cp_flag, float ttm,
+                                 float r, float q, const char* model_path);
+
+    /**
+     * @brief Calculates the implied volatilities for a batch of American options using neural networks (single precision).
+     * @see american_neural_iv_fp64_batch for parameter details.
+     */
+    void american_neural_iv_fp32_batch(const float *__restrict__ P,
+                                      const float *__restrict__ S,
+                                      const float *__restrict__ K,
+                                      const char *__restrict__ cp_flag,
+                                      const float *__restrict__ ttm,
+                                      const float *__restrict__ r,
+                                      const float *__restrict__ q,
+                                      size_t n_options,
+                                      float *__restrict__ results,
+                                      const char* model_path);
+#endif
+
     /* european::bsm =============================================================================*/
     /* fp64 --------------------------------------------------------------------------------------*/
     /* price _____________________________________________________________________________________*/
